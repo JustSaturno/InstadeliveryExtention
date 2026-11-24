@@ -1,0 +1,490 @@
+{
+  "complement_groups": [
+    {
+      "id": null,
+      "name": "Tamanho da Pizza TESTE",
+      "min": 1,
+      "max": 1,
+      "only_one": true,
+      "order": 1,
+      "complements": [
+        {
+          "id": null,
+          "name": "Pequena",
+          "price": 30
+        },
+        {
+          "id": null,
+          "name": "Média",
+          "price": 40
+        },
+        {
+          "id": null,
+          "name": "Grande",
+          "price": 50
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "Tamanho Açaí TESTE",
+      "min": 1,
+      "max": 1,
+      "only_one": true,
+      "order": 2,
+      "complements": [
+        {
+          "id": null,
+          "name": "300ml",
+          "price": 14
+        },
+        {
+          "id": null,
+          "name": "500ml",
+          "price": 20
+        },
+        {
+          "id": null,
+          "name": "700ml",
+          "price": 26
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "Extras TESTE",
+      "min": 0,
+      "max": 3,
+      "only_one": false,
+      "order": 3,
+      "complements": [
+        {
+          "id": null,
+          "name": "Bacon",
+          "price": 4
+        },
+        {
+          "id": null,
+          "name": "Cheddar",
+          "price": 3
+        },
+        {
+          "id": null,
+          "name": "Ovo",
+          "price": 2
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "Ponto da Carne TESTE",
+      "min": 1,
+      "max": 1,
+      "only_one": true,
+      "order": 4,
+      "complements": [
+        {
+          "id": null,
+          "name": "Mal passado",
+          "price": 0
+        },
+        {
+          "id": null,
+          "name": "Ao ponto",
+          "price": 0
+        },
+        {
+          "id": null,
+          "name": "Bem passado",
+          "price": 0
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "Adicionais TESTE",
+      "min": 0,
+      "max": 5,
+      "only_one": false,
+      "order": 5,
+      "complements": [
+        {
+          "id": null,
+          "name": "Queijo",
+          "price": 3
+        },
+        {
+          "id": null,
+          "name": "Presunto",
+          "price": 3
+        },
+        {
+          "id": null,
+          "name": "Ovo Frito",
+          "price": 3
+        },
+        {
+          "id": null,
+          "name": "Catupiry",
+          "price": 3
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "Grupo para Apagar TESTE",
+      "min": 0,
+      "max": 2,
+      "only_one": false,
+      "order": 6,
+      "complements": [
+        {
+          "id": null,
+          "name": "Opção A",
+          "price": 1
+        },
+        {
+          "id": null,
+          "name": "Opção B",
+          "price": 2
+        }
+      ]
+    }
+  ],
+  "menu": [
+    {
+      "id": null,
+      "name": "TESTE - Bebidas",
+      "is_invisible": 1,
+      "itens": [
+        {
+          "id": null,
+          "name": "Coca-Cola Lata 350ml",
+          "price1": 6,
+          "is_invisible": 1
+        },
+        {
+          "id": null,
+          "name": "Coca-Cola 2L",
+          "price1": 12,
+          "is_invisible": 1
+        },
+        {
+          "id": null,
+          "name": "Guaraná Antarctica 2L",
+          "price1": 11,
+          "is_invisible": 1
+        },
+        {
+          "id": null,
+          "name": "Fanta Uva Lata 350ml",
+          "price1": 6,
+          "is_invisible": 1
+        },
+        {
+          "id": null,
+          "name": "Pepsi 3L",
+          "price1": 14,
+          "is_invisible": 1
+        },
+        {
+          "id": null,
+          "name": "Pepsi Lata 350ml",
+          "price1": 6,
+          "is_invisible": 1,
+          "image_url": null,
+          "is_newest": 1
+        },
+        {
+          "id": null,
+          "name": "Kombucha de Hibisco 300ml",
+          "price1": 15,
+          "is_invisible": 1
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "TESTE - Bebidas +18",
+      "is_invisible": 1,
+      "itens": [
+        {
+          "id": null,
+          "name": "Cerveja Heineken 350ml",
+          "price1": 9,
+          "is_invisible": 1,
+          "is_alcohol": 1,
+          "strike_price": 11,
+          "is_best_seller": 1
+        },
+        {
+          "id": null,
+          "name": "Cerveja Skol 350ml",
+          "price1": 6,
+          "is_invisible": 1,
+          "is_alcohol": 1
+        },
+        {
+          "id": null,
+          "name": "Vinho Tinto Suave 750ml",
+          "price1": 45,
+          "is_invisible": 1,
+          "image_query": "vinho",
+          "minimum_quantity": 1,
+          "is_alcohol": 1
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "TESTE - Hambúrgueres",
+      "is_invisible": 1,
+      "itens": [
+        {
+          "id": null,
+          "name": "X-Salada",
+          "price1": 18,
+          "is_invisible": 1,
+          "complement_group_ids": [
+            "Extras TESTE",
+            "Adicionais TESTE"
+          ]
+        },
+        {
+          "id": null,
+          "name": "X-Bacon",
+          "price1": 22,
+          "is_invisible": 1,
+          "complement_group_ids": [
+            "Extras TESTE",
+            "Ponto da Carne TESTE",
+            "Adicionais TESTE"
+          ]
+        },
+        {
+          "id": null,
+          "name": "Hambúrguer de Frango",
+          "price1": 20,
+          "is_invisible": 1
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "TESTE - Pizzas",
+      "is_invisible": 1,
+      "itens": [
+        {
+          "id": null,
+          "name": "Pizza de Calabresa TESTE",
+          "price1": 0,
+          "is_invisible": 1,
+          "from_price": 30,
+          "complement_group_ids": [
+            "Tamanho da Pizza TESTE"
+          ],
+          "is_highlight": 1,
+          "internal_id": "PZ-001"
+        },
+        {
+          "id": null,
+          "name": "Pizza de Mussarela TESTE",
+          "price1": 0,
+          "is_invisible": 1,
+          "from_price": 30,
+          "complement_group_ids": [
+            "Tamanho da Pizza TESTE",
+            "Grupo para Apagar TESTE"
+          ]
+        },
+        {
+          "id": null,
+          "name": "Pizza de Frango com Catupiry TESTE",
+          "price1": 0,
+          "is_invisible": 1,
+          "from_price": 30,
+          "complement_group_ids": [
+            "Tamanho da Pizza TESTE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "TESTE - Açaí",
+      "is_invisible": 1,
+      "itens": [
+        {
+          "id": null,
+          "name": "Açaí na Tigela TESTE",
+          "price1": 0,
+          "is_invisible": 1,
+          "from_price": 14,
+          "complement_group_ids": [
+            "Tamanho Açaí TESTE"
+          ],
+          "days": [
+            "fri",
+            "sat",
+            "sun"
+          ]
+        },
+        {
+          "id": null,
+          "name": "Açaí no Copo TESTE",
+          "price1": 0,
+          "is_invisible": 1,
+          "from_price": 14,
+          "complement_group_ids": [
+            "Tamanho Açaí TESTE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "TESTE - Combos Promocionais",
+      "is_invisible": 1,
+      "itens": [
+        {
+          "id": null,
+          "name": "Coca-Cola 2L TESTE",
+          "price1": 11,
+          "is_invisible": 1
+        },
+        {
+          "id": null,
+          "name": "Guaraná Antarctica 2L TESTE",
+          "price1": 10,
+          "is_invisible": 1
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "TESTE - Imagem Externa",
+      "is_invisible": 1,
+      "image_url": null,
+      "itens": [
+        {
+          "id": null,
+          "name": "Item Imagem Externa TESTE",
+          "price1": 10,
+          "is_invisible": 1,
+          "image_url": "https://COLE-AQUI-O-SEU-SITE.exemplo/imagem.jpg"
+        },
+        {
+          "id": null,
+          "name": "Item Sem Imagem TESTE",
+          "price1": 5,
+          "is_invisible": 1,
+          "image_url": null
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "TESTE - Banner por Link",
+      "is_invisible": 1,
+      "image_url": "https://instadelivery-public.nyc3.digitaloceanspaces.com/images/0YRIuSk9TCgYxOCHQYsRW5Jy1CSHmREoPH1Dsxyj.jpg",
+      "itens": [
+        {
+          "id": null,
+          "name": "Coca-Cola Teste Link",
+          "price1": 7,
+          "is_invisible": 1,
+          "image_url": "https://instadelivery-public.nyc3.digitaloceanspaces.com/images/aYxolBcbGYJ4OtrxAnDck8OuGVB7hPofJH7X5IaZ.png"
+        }
+      ]
+    },
+    {
+      "id": null,
+      "name": "TESTE - Verificação +18",
+      "is_invisible": 1,
+      "itens": [
+        {
+          "id": null,
+          "name": "Cerveja Brahma Chopp 600ml TESTE",
+          "price1": 9,
+          "is_invisible": 1,
+          "is_alcohol": 1
+        },
+        {
+          "id": null,
+          "name": "Vinho Tinto Seco 750ml TESTE",
+          "price1": 52,
+          "is_invisible": 1,
+          "is_alcohol": 1
+        },
+        {
+          "id": null,
+          "name": "Caipirinha de Limão TESTE",
+          "price1": 18,
+          "is_invisible": 1,
+          "is_alcohol": 1
+        },
+        {
+          "id": null,
+          "name": "Whisky Red Label 1L TESTE",
+          "price1": 120,
+          "is_invisible": 1,
+          "is_alcohol": 1
+        },
+        {
+          "id": null,
+          "name": "Vodka Smirnoff 998ml TESTE",
+          "price1": 60,
+          "is_invisible": 1,
+          "is_alcohol": 1
+        },
+        {
+          "id": null,
+          "name": "Espumante Brut 750ml TESTE",
+          "price1": 70,
+          "is_invisible": 1,
+          "is_alcohol": true
+        },
+        {
+          "id": null,
+          "name": "Cerveja Heineken 0.0 350ml TESTE",
+          "price1": 9,
+          "is_invisible": 1,
+          "is_alcohol": 0
+        },
+        {
+          "id": null,
+          "name": "Caipirinha sem Álcool TESTE",
+          "price1": 15,
+          "is_invisible": 1,
+          "is_alcohol": 0
+        },
+        {
+          "id": null,
+          "name": "Suco de Uva Integral 1L TESTE",
+          "price1": 14,
+          "is_invisible": 1,
+          "is_alcohol": 0
+        },
+        {
+          "id": null,
+          "name": "Cachaça Artesanal 700ml TESTE",
+          "price1": 40,
+          "is_invisible": 1
+        },
+        {
+          "id": null,
+          "name": "Gin Tônica TESTE",
+          "price1": 25,
+          "is_invisible": 1
+        },
+        {
+          "id": null,
+          "name": "Cerveja Sem Álcool Long Neck TESTE",
+          "price1": 8,
+          "is_invisible": 1,
+          "is_alcohol": 1
+        }
+      ]
+    }
+  ]
+}

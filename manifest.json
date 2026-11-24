@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Menu JSON Tool for InstaDelivery",
+  "description": "Export an InstaDelivery menu as JSON, edit it with an AI, and apply the changes to your own store.",
+  "version": "2.5",
+
+  "icons": {
+    "16": "images/Logo_Dark2.png",
+    "32": "images/Logo_Dark2.png",
+    "48": "images/Logo_Dark2.png",
+    "128": "images/Logo_Dark2.png"
+  },
+
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "clipboardWrite",
+    "webRequest",
+    "sidePanel"
+  ],
+
+  "host_permissions": [
+    "https://instadelivery.com.br/*",
+    "https://app.instadelivery.com.br/*",
+    "https://instadelivery-public.nyc3.digitaloceanspaces.com/*",
+    "https://instadelivery-public.nyc3.cdn.digitaloceanspaces.com/*"
+  ],
+
+  "optional_host_permissions": ["https://*/*"],
+
+  "background": { "service_worker": "background.js" },
+
+  "action": {
+    "default_title": "Abrir Ferramenta de Menu JSON",
+    "default_icon": "images/Logo_Dark2.png"
+  },
+
+  "side_panel": { "default_path": "app.html" }
+}

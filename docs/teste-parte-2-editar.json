@@ -1,0 +1,38 @@
+{
+  "menu": [
+    {
+      "id": 1198999,
+      "itens": [
+        {
+          "id": 111111,
+          "price1": 7
+        },
+        {
+          "id": 222222,
+          "from_price": 35
+        },
+        {
+          "id": 333333,
+          "from_price": null
+        },
+        {
+          "id": 444444,
+          "is_invisible": 0
+        },
+        {
+          "id": 666666,
+          "is_alcohol": 1,
+          "days": [
+            "fri",
+            "sat"
+          ],
+          "strike_price": 20
+        },
+        {
+          "id": 555555,
+          "_delete": true
+        }
+      ]
+    }
+  ]
+}

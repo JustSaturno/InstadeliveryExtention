@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ferramenta de Menu JSON</title>
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+
+  <!-- ===== TOP BAR: logo, tabs and status pills ===== -->
+  <header class="top">
+    <div class="brand">
+      <img src="images/Logo_Dark2.png" class="logo" alt="Logo" />
+      <div><strong>InstaDelivery Ferramenta de Menu</strong></div>
+    </div>
+
+    <nav class="tabs">
+      <button data-tab="json" class="active">JSON</button>
+      <button data-tab="history">Histórico</button>
+      <button data-tab="options">Opções</button>
+      <!-- This tab only appears in "Modo avançado" (class adv-only). Its id is still "dev". -->
+      <button data-tab="dev" class="adv-only">Avançado</button>
+    </nav>
+
+    <div class="pills">
+      <span id="pillToken" class="pill">Token</span>
+      <span id="pillStore" class="pill">Loja</span>
+    </div>
+  </header>
+
+  <!-- ===== STORE BAR: shows WHICH store we are working on, big and clear ===== -->
+  <div id="storeBar" class="storebar nostore">
+    <div>
+      <div id="storeName" class="storename">Nenhuma loja detectada</div>
+      <div id="storeIdText" class="storeid">Abra o editor de menu da loja em outra aba e recarregue (F5).</div>
+    </div>
+    <button id="btnRenameStore" class="btn small" hidden>Trocar nome</button>
+    <div id="storeWarn" class="storewarn" hidden></div>
+  </div>
+
+  <main>
+
+    <!-- ================= TAB 1: JSON ================= -->
+    <section id="tab-json" class="tab active">
+
+      <!-- First-time guide. The button below hides it for good. -->
+      <div id="howto" class="card howto" hidden>
+        <h2>Como usar (4 passos)</h2>
+        <ol>
+          <li>Abra o <b>editor de menu</b> da loja em outra aba do Chrome. O nome da loja aparece aqui em cima.</li>
+          <li>Escreva o seu pedido e clique em <b>Copiar prompt + menu + pedido</b>. Cole tudo numa IA (Claude ou ChatGPT).</li>
+          <li>Copie o JSON que a IA devolveu e cole na caixa <b>2</b>. Clique em <b>Ver mudanças</b>.</li>
+          <li>Confira a lista, desmarque o que não quiser e clique em <b>Aplicar</b>. Dá para desfazer na aba <b>Histórico</b>.</li>
+        </ol>
+        <button id="btnHideHowto" class="btn">Entendi, não mostrar de novo</button>
+      </div>
+
+      <div class="grid2">
+
+        <!-- Step 1: export -->
+        <div class="card">
+          <div class="card-h"><span class="step">1</span><h2>Exportar o menu e pedir à IA</h2></div>
+          <p class="hint">Deixe o editor de menu aberto em outra aba (recarregue com F5 se o token estiver vermelho). Escreva o que você quer mudar e copie tudo para a IA de uma vez.</p>
+          <textarea id="requestBox" class="request" rows="4" spellcheck="true" placeholder="Meu pedido. Exemplos: coca-cola 2 reais; aumentar todas as bebidas em 10%; esconder as sobremesas; criar o grupo Porções com batata frita 25 e polenta 22"></textarea>
+          <div class="actions">
+            <button id="btnCopyAll" class="btn primary">Copiar prompt + menu + pedido</button>
+            <span class="muted">Exporta o menu agora e copia tudo pronto para colar na IA.</span>
+          </div>
+          <div class="actions">
+            <button id="btnExport" class="btn">Só exportar o JSON</button>
+            <input id="storeIdOverride" class="input adv-only" placeholder="ID da loja (opcional, detectado sozinho)" />
+          </div>
+          <textarea id="exportBox" class="code" rows="16" spellcheck="false" placeholder="O JSON exportado aparece aqui"></textarea>
+          <div class="actions between">
+            <span id="exportMeta" class="muted">Nada exportado ainda</span>
+            <span class="actions">
+              <button id="btnCopyExport" class="btn">Copiar</button>
+              <button id="btnDownloadExport" class="btn">Baixar</button>
+            </span>
+          </div>
+        </div>
+
+        <!-- Step 2: paste what the AI returned -->
+        <div class="card">
+          <div class="card-h"><span class="step">2</span><h2>Colar o JSON da IA</h2></div>
+          <p class="hint">Cole o JSON completo que a IA devolveu (só o bloco de código), ou carregue um arquivo .json.</p>
+          <textarea id="importBox" class="code" rows="16" spellcheck="false" placeholder="Cole aqui o JSON editado"></textarea>
+          <div class="actions between">
+            <span id="jsonState" class="muted">Vazio</span>
+            <span class="actions">
+              <label class="btn">Carregar arquivo<input id="fileInput" type="file" accept=".json,application/json" hidden /></label>
+              <button id="btnFormat" class="btn">Formatar</button>
+              <button id="btnClearImport" class="btn">Limpar</button>
+              <button id="btnPreview" class="btn primary">Ver mudanças</button>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: review and apply (starts hidden) -->
+      <div id="reviewCard" class="card" hidden>
+        <div class="card-h"><span class="step">3</span><h2>Revisar e aplicar</h2></div>
+        <div id="reviewStatus" class="muted"></div>
+        <div id="summary" class="chips"></div>
+        <div id="warnings" class="warnbox" hidden></div>
+        <div class="selectbar">
+          <span id="selectInfo" class="muted"></span>
+          <button id="btnSelectAll" class="btn small">Marcar todas</button>
+          <button id="btnSelectNone" class="btn small">Desmarcar todas</button>
+        </div>
+        <div id="changes" class="changes"></div>
+        <div id="thumbs"></div>
+        <div class="actions">
+          <button id="btnApply" class="btn primary" disabled>Aplicar mudanças</button>
+          <span class="muted">Só as mudanças marcadas serão enviadas. Leia a lista antes de aplicar.</span>
+        </div>
+        <div id="progressWrap" class="progress" hidden>
+          <progress id="progressBar" value="0" max="1"></progress>
+          <div id="progressText" class="muted"></div>
+        </div>
+        <div id="applySummary" class="applysummary" hidden></div>
+        <div id="applyLog" class="log" hidden></div>
+      </div>
+    </section>
+
+    <!-- ================= TAB: HISTORY ================= -->
+    <section id="tab-history" class="tab">
+      <div class="card">
+        <div class="actions between">
+          <h2>Histórico de aplicações</h2>
+          <button id="btnClearHistory" class="btn small">Limpar histórico</button>
+        </div>
+        <p class="hint">Cada vez que você clica em Aplicar, fica registrado aqui: data, loja e quantidade de mudanças.</p>
+        <div id="historyList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Desfazer a última aplicação</h2>
+        <p id="undoInfo" class="hint">Nenhuma aplicação para desfazer.</p>
+        <div class="actions"><button id="btnUndo" class="btn danger" disabled>Desfazer última aplicação</button></div>
+        <details>
+          <summary>O que dá e o que não dá para desfazer</summary>
+          <ul>
+            <li><b>Dá:</b> voltar os campos editados (nome, preço, descrição, visibilidade etc., inclusive de grupos de complementos e opções) para o valor de antes, apagar os itens, as opções e os grupos de complementos que foram criados, e recriar opções apagadas (com um id novo) e ligar de novo complementos desligados.</li>
+            <li><b>Não dá:</b> apagar os grupos do cardápio que foram criados, porque a plataforma não oferece isso à extensão. Isso é feito à mão no editor.</li>
+            <li><b>Não dá:</b> trazer de volta um item que foi apagado. Por isso existe o backup (arquivo baixado antes de cada Aplicar).</li>
+            <li><b>Imagens:</b> uma imagem trocada pode não voltar à anterior. Confira no editor.</li>
+            <li>Se alguém editou o mesmo item no editor depois da aplicação, desfazer vai sobrescrever essa edição.</li>
+          </ul>
+        </details>
+        <div id="undoLog" class="log" hidden></div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: OPTIONS ================= -->
+    <section id="tab-options" class="tab">
+      <div class="card">
+        <h2>Segurança</h2>
+        <label class="opt"><div><strong>Baixar um backup antes de cada Aplicar</strong><small>Salva o menu atual inteiro como arquivo .json na sua pasta Downloads, com o nome e o id da loja no nome do arquivo. Não salva se a loja ainda tem o cardápio padrão (Promoções / Item teste).</small></div><input type="checkbox" class="switch" data-opt="autoBackup" /></label>
+        <label class="opt"><div><strong>Pedir confirmação antes de aplicar</strong><small>Mostra primeiro o ID da loja e o número de mudanças.</small></div><input type="checkbox" class="switch" data-opt="confirmApply" /></label>
+        <label class="opt"><div><strong>Permitir apagar itens</strong><small>Desligado, os itens marcados com "_delete": true são ignorados, com um aviso. Deixe desligado, a não ser que esteja limpando um menu.</small></div><input type="checkbox" class="switch" data-opt="allowDeletes" /></label>
+        <label class="opt"><div><strong>Simular antes de aplicar</strong><small>O primeiro clique em Aplicar só mostra o que seria enviado. O segundo clique envia de verdade.</small></div><input type="checkbox" class="switch" data-opt="simulateFirst" /></label>
+        <label class="opt"><div><strong>Pedir o nome da loja antes de aplicar</strong><small>Você precisa digitar o nome da loja para confirmar. Recomendado para quem cuida de várias lojas.</small></div><input type="checkbox" class="switch" data-opt="typeStoreName" /></label>
+        <label class="opt"><div><strong>Digitar APAGAR para confirmar exclusões</strong><small>Evita apagar itens sem querer.</small></div><input type="checkbox" class="switch" data-opt="typeToDelete" /></label>
+        <label class="opt"><div><strong>Confirmação extra acima de</strong><small>Se o Aplicar tiver mais mudanças do que isso, pergunta de novo.</small></div>
+          <select data-opt="maxChanges" data-num="1"><option value="20">20 mudanças</option><option value="50">50 mudanças</option><option value="100">100 mudanças</option><option value="1000000">Nunca</option></select></label>
+        <label class="opt adv-only"><div><strong>Somente simulação (dry run)</strong><small>Aplicar NUNCA envia nada, só lista as requisições. Para testes.</small></div><input type="checkbox" class="switch" data-opt="dryRun" /></label>
+      </div>
+
+      <div class="card">
+        <h2>Exportação</h2>
+        <label class="opt"><div><strong>Copiar para a área de transferência após exportar</strong><small>Assim você já pode colar direto na IA.</small></div><input type="checkbox" class="switch" data-opt="copyOnExport" /></label>
+        <label class="opt adv-only"><div><strong>Incluir grupos de complementos (adicionais)</strong><small>Desligado, a exportação traz só a lista de grupos e itens.</small></div><input type="checkbox" class="switch" data-opt="includeComplements" /></label>
+      </div>
+
+      <div class="card">
+        <h2>Imagens</h2>
+        <label class="opt"><div><strong>Enviar imagens a partir de "image_url"</strong><small>Desligado, os valores de image_url são ignorados.</small></div><input type="checkbox" class="switch" data-opt="imagesEnabled" /></label>
+        <label class="opt adv-only"><div><strong>Tamanho máximo da imagem</strong><small>Lado maior em pixels. Imagens maiores são reduzidas antes do envio.</small></div>
+          <select data-opt="maxSide" data-num="1"><option value="800">800 px</option><option value="1200">1200 px</option><option value="1600">1600 px</option><option value="2000">2000 px</option></select></label>
+        <label class="opt adv-only"><div><strong>Qualidade do JPEG</strong><small>Mais alta significa mais nítida e mais pesada.</small></div>
+          <select data-opt="quality" data-num="1"><option value="0.7">Baixa (0,70)</option><option value="0.85">Normal (0,85)</option><option value="0.92">Alta (0,92)</option></select></label>
+      </div>
+
+      <div class="card">
+        <h2>Banco de imagens</h2>
+        <label class="opt"><div><strong>Usar o banco de imagens automaticamente</strong><small>Itens sem imagem recebem a foto parecida do banco de imagens da plataforma, mesmo que a IA não envie nenhuma. Você vê a escolha antes de aplicar.</small></div><input type="checkbox" class="switch" data-opt="bankEnabled" /></label>
+        <label class="opt"><div><strong>Escolher banners dos grupos automaticamente</strong><small>Grupos sem banner recebem uma imagem de fundo do banco de banners, pelo nome do grupo ou pelo conteúdo dos itens. Você vê a escolha antes de aplicar.</small></div><input type="checkbox" class="switch" data-opt="bankGroupsEnabled" /></label>
+        <label class="opt adv-only"><div><strong>Como enviar o banner do grupo</strong><small>O padrão faz o mesmo que o editor da plataforma: envia o link da imagem nos campos "image" e "file". Só mude isso para experimentos.</small></div>
+          <select data-opt="groupBannerMode"><option value="bank-url">Link em image e file (igual ao editor)</option><option value="image-url">Link só em image</option><option value="file">Arquivo em file</option><option value="image">Arquivo em image</option></select></label>
+        <label class="opt"><div><strong>Rigor da busca</strong><small>Rigoroso evita fotos erradas, mas deixa mais itens sem imagem. Flexível acha mais, mas erra mais.</small></div>
+          <select data-opt="bankMinRecall" data-num="1"><option value="0.8">Rigoroso</option><option value="0.6">Normal</option><option value="0.4">Flexível</option></select></label>
+        <label class="opt"><div><strong>Usar o logo da loja nos itens sem foto</strong><small>Itens NOVOS que não acharam foto no banco de imagens recebem o logo da loja. O endereço do cardápio da loja é lido sozinho (GET /stores/{id}). Desligado por padrão.</small></div><input type="checkbox" class="switch" data-opt="logoFallback" /></label>
+        <label class="opt"><div><strong>Trocar também imagens que já existem</strong><small>Desligado, só itens sem imagem (e itens novos) recebem foto do banco.</small></div><input type="checkbox" class="switch" data-opt="bankReplaceExisting" /></label>
+      </div>
+
+      <div class="card adv-only">
+        <h2>Rede</h2>
+        <label class="opt"><div><strong>Pausa entre as requisições de salvar</strong><small>Útil se a plataforma começar a recusar requisições rápidas.</small></div>
+          <select data-opt="delayMs" data-num="1"><option value="0">Nenhuma</option><option value="200">200 ms</option><option value="500">500 ms</option><option value="1000">1 segundo</option></select></label>
+      </div>
+
+      <div class="card">
+        <h2>Aparência</h2>
+        <label class="opt"><div><strong>Tema</strong></div>
+          <select data-opt="theme"><option value="auto">Igual ao sistema</option><option value="light">Claro</option><option value="dark">Escuro</option></select></label>
+      </div>
+
+      <div class="card">
+        <h2>Modo</h2>
+        <label class="opt"><div><strong>Modo avançado</strong><small>Mostra a aba Avançado (registro de requisições, capturas, dados brutos) e opções técnicas. Quem só edita o menu pode deixar desligado.</small></div><input type="checkbox" class="switch" data-opt="advancedMode" /></label>
+      </div>
+
+      <div class="card">
+        <h2>Ajuda e suporte</h2>
+        <p class="hint">Versão da extensão: <b id="versionText">?</b></p>
+        <div class="actions">
+          <button id="btnShowHowto" class="btn">Mostrar o guia "Como usar"</button>
+          <button id="btnDiagnostic" class="btn">Copiar relatório de diagnóstico</button>
+        </div>
+        <p class="hint">O relatório mostra versão, loja, últimos erros e últimas requisições. Ele <b>nunca</b> contém o token (a chave de login). Envie para quem cuida da ferramenta quando algo der errado.</p>
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: ADVANCED (id is still "dev") ================= -->
+    <section id="tab-dev" class="tab">
+      <div class="grid2">
+        <div class="card">
+          <h2>Status</h2>
+          <div id="statusGrid" class="statusgrid"></div>
+          <div class="actions"><button id="btnTest" class="btn">Testar conexão</button></div>
+        </div>
+        <div class="card">
+          <h2>Dados</h2>
+          <p class="hint">A extensão guarda uma cópia da última exportação para comparar depois.</p>
+          <div class="actions">
+            <button id="btnRaw" class="btn">Baixar dados brutos da plataforma</button>
+            <button id="btnRefreshBank" class="btn">Atualizar banco de imagens</button>
+            <button id="btnClearStore" class="btn">Apagar cópia salva do menu</button>
+            <button id="btnResetOpts" class="btn danger">Restaurar opções</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DANGER ZONE: wipe the whole store ===== -->
+      <div class="card dangerzone">
+        <h2>Zona de perigo: limpar a loja</h2>
+        <p class="hint">Apaga o conteúdo da loja que está aberta no editor. Útil para testes e para lojas que serão refeitas do zero. <b>Não tem como desfazer.</b> Um backup é baixado antes.</p>
+        <label class="opt"><div><strong>Apagar os itens</strong><small>Todos os itens de todos os grupos.</small></div><input type="checkbox" class="switch" id="wipeItems" checked /></label>
+        <label class="opt"><div><strong>Apagar os grupos</strong><small>Os grupos do menu (precisa apagar os itens também).</small></div><input type="checkbox" class="switch" id="wipeGroups" checked /></label>
+        <label class="opt"><div><strong>Apagar os grupos de complementos</strong><small>Os adicionais (Extras, Tamanhos...).</small></div><input type="checkbox" class="switch" id="wipeComps" checked /></label>
+        <div class="actions"><button id="btnWipe" class="btn danger">Limpar a loja…</button></div>
+        <p class="hint">Atenção: apagar itens é o que o editor da plataforma faz, então funciona. Apagar <b>grupos de complementos</b> usa o endereço confirmado por captura. Apagar <b>grupos</b> do cardápio usa um endereço que ainda não foi confirmado. Se a plataforma recusar, a ferramenta para e explica (veja "Capturas do editor" abaixo).</p>
+        <div id="wipeLog" class="log" hidden></div>
+      </div>
+
+      <div class="card">
+        <div class="actions between">
+          <h2>Registro de requisições</h2>
+          <span class="actions"><button id="btnCopyLog" class="btn">Copiar</button><button id="btnClearLog" class="btn">Limpar</button></span>
+        </div>
+        <p class="hint">Toda requisição que esta ferramenta envia para a plataforma. Nos erros, aparece a resposta do servidor.</p>
+        <div id="reqLog" class="reqlog"></div>
+      </div>
+
+      <div class="card">
+        <div class="actions between">
+          <h2>Capturas do editor</h2>
+          <span class="actions"><button id="btnRefreshCaptured" class="btn">Atualizar</button><button id="btnCopyCaptured" class="btn">Copiar tudo</button><button id="btnClearCaptured" class="btn">Limpar</button></span>
+        </div>
+        <p class="hint">Os salvamentos que você faz no editor da própria plataforma são gravados aqui (os últimos 15, sem o token). Limpe, faça uma ação no editor, clique em Atualizar e me envie o resultado para eu adicionar essa função.</p>
+        <div id="capturedList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Como funciona</h2>
+        <details open><summary>O que a ferramenta consegue fazer</summary>
+          <table>
+            <tr><th>Ação</th><th>Como</th><th>Status</th></tr>
+            <tr><td>Editar nome, descrição, preços (price1, price2, from_price, strike_price), ordem, visibilidade, +18, destaque, mais vendido, novidade, código interno, quantidade mínima e dias da semana do item</td><td>salvar item</td><td>funciona</td></tr>
+            <tr><td>Criar itens (com imagem opcional)</td><td>criar item</td><td>funciona</td></tr>
+            <tr><td>Apagar itens ("_delete": true)</td><td>apagar item</td><td>funciona (desligado por padrão)</td></tr>
+            <tr><td>Criar grupos e editar nome/descrição/ordem/visibilidade do grupo</td><td>criar / salvar grupo</td><td>funciona</td></tr>
+            <tr><td>Criar grupos de complementos e ligá-los aos itens</td><td>criar / ligar complemento</td><td>funciona</td></tr>
+            <tr><td>Enviar a imagem principal do item a partir de "image_url"</td><td>salvar item (multipart)</td><td>funciona</td></tr>
+            <tr><td>Editar grupos de complementos (nome, mín, máx...) e opções (nome, preço...)</td><td>salvar grupo / opção (PUT)</td><td>funciona</td></tr>
+            <tr><td>Adicionar uma opção a um grupo de complementos existente</td><td>salvar grupo de complementos (POST)</td><td>funciona</td></tr>
+            <tr><td>Apagar uma opção de complemento</td><td>DELETE opção</td><td>funciona</td></tr>
+            <tr><td>Desligar um complemento de um item</td><td>DELETE ligação</td><td>funciona</td></tr>
+            <tr><td>Apagar um grupo de complementos inteiro</td><td>DELETE grupo de complementos</td><td>funciona</td></tr>
+            <tr><td>Apagar grupos do cardápio, fotos extras</td><td>ainda não capturado</td><td>não suportado</td></tr>
+          </table>
+        </details>
+        <details><summary>Requisições que a ferramenta usa (vistas no editor)</summary>
+          <table>
+            <tr><td>GET</td><td><code>/api/stores/group/{loja}</code></td><td>menu inteiro</td></tr>
+            <tr><td>GET</td><td><code>/api/stores/group-complements/{loja}</code></td><td>grupos de complementos e ligações</td></tr>
+            <tr><td>GET</td><td><code>/api/stores/{loja}</code></td><td>dados da loja: nome e endereço do cardápio (url)</td></tr>
+            <tr><td>GET</td><td><code>/api/stores/by-slug/{endereço}</code></td><td>cardápio público da loja; usamos só o logo (design.logo), sem login</td></tr>
+            <tr><td>POST</td><td><code>/api/stores/item/{id}</code></td><td>salvar item (multipart, registro completo)</td></tr>
+            <tr><td>POST</td><td><code>/api/stores/item</code></td><td>criar item</td></tr>
+            <tr><td>DELETE</td><td><code>/api/stores/item/{id}</code></td><td>apagar item</td></tr>
+            <tr><td>POST</td><td><code>/api/stores/group</code></td><td>criar grupo</td></tr>
+            <tr><td>POST</td><td><code>/api/stores/group/{id}</code></td><td>salvar grupo</td></tr>
+            <tr><td>POST</td><td><code>/api/stores/complement-group/store</code></td><td>criar grupo de complementos (ou adicionar opções, quando leva o id do grupo)</td></tr>
+            <tr><td>DELETE</td><td><code>/api/stores/complement/{id}</code></td><td>apagar uma opção de complemento</td></tr>
+            <tr><td>DELETE</td><td><code>/api/stores/group-complements/link/{grupo}/{item}</code></td><td>desligar um grupo de complementos de um item</td></tr>
+            <tr><td>DELETE</td><td><code>/api/stores/group-complements/by-id/{id}</code></td><td>apagar um grupo de complementos inteiro</td></tr>
+            <tr><td>POST</td><td><code>/api/stores/group-complements/link</code></td><td>ligar grupo de complementos a um item (JSON)</td></tr>
+            <tr><td>PUT</td><td><code>/api/stores/group-complements/by-id/{id}</code></td><td>editar grupo de complementos (JSON, registro completo)</td></tr>
+            <tr><td>PUT</td><td><code>/api/stores/complement/by-id/{id}</code></td><td>editar uma opção de complemento (JSON, preço como texto)</td></tr>
+            <tr><td>GET</td><td><code>/api/images/1</code></td><td>banco de imagens dos produtos (categorias, nomes e links)</td></tr>
+            <tr><td>GET</td><td><code>/api/images/2</code></td><td>banco de banners dos grupos</td></tr>
+          </table>
+        </details>
+        <details><summary>Formato do JSON</summary>
+          <ul>
+            <li>A exportação é <code>{ "complement_groups": [...], "menu": [...] }</code>. Uma lista simples de grupos também funciona.</li>
+            <li>Tudo que tiver <code>"id": null</code> é criado. Os ids existentes nunca são alterados.</li>
+            <li>Itens que faltam no seu JSON <b>nunca</b> são apagados. Apagar exige <code>"_delete": true</code> e a opção ligada nas Opções.</li>
+            <li><code>has_image</code> é só informação (somente leitura). <code>image_url</code> deve ser um link https para um arquivo de imagem.</li>
+            <li>Para ligar complementos, use <code>complement_group_ids</code> no item (ids, ou o nome de um grupo criado no mesmo JSON).</li>
+            <li>Itens com complementos podem ser editados normalmente. O editor os envia como qualquer outro item.</li>
+            <li><b>"A partir de":</b> <code>"from_price": 20</code> no item mostra "A partir de R$ 20" no cardápio (útil quando o preço depende do tamanho). <code>null</code> remove.</li>
+            <li><b>Campos extras do item:</b> <code>strike_price</code> (preço riscado), <code>is_alcohol</code> (+18), <code>is_highlight</code>, <code>is_best_seller</code>, <code>is_newest</code> (0 ou 1), <code>minimum_quantity</code>, <code>internal_id</code> e <code>days</code> (<code>"all"</code> ou uma lista como <code>["fri","sat"]</code>).</li>
+            <li><b>Banco de imagens:</b> itens sem imagem (e itens novos) recebem automaticamente a foto parecida do banco da plataforma. Um <code>image_url</code> enviado pela IA sempre vence. Use <code>"image_url": null</code> para um item NÃO receber foto do banco, e <code>"image_query": "refrigerante lata"</code> para dar uma dica de busca. Tudo isso também vale para grupos (banners).</li>
+          </ul>
+        </details>
+        <details><summary>Ordem das operações ao aplicar</summary>
+          <ol>
+            <li>Edições de grupos</li><li>Edições de itens e imagens</li><li>Novos grupos (os ids são buscados depois da criação)</li>
+            <li>Novos itens</li><li>Novos grupos de complementos</li><li>Ligações de complementos</li><li>Exclusões (por último)</li>
+          </ol>
+          <p>O primeiro erro interrompe tudo que viria depois. Clique em Exportar para ver o estado atual e use o arquivo de backup se precisar desfazer algo à mão.</p>
+        </details>
+        <details><summary>Problemas comuns</summary>
+          <ul>
+            <li><b>Erro 401 / "Sem token":</b> o token expirou. Recarregue a aba do editor (F5), espere carregar e tente de novo. Ele também é apagado sempre que você recarrega a extensão.</li>
+            <li><b>Pílula da loja vazia:</b> recarregue o editor na página do menu, para a extensão ver a requisição do menu.</li>
+            <li><b>Imagem ignorada:</b> o link não é um arquivo de imagem direto, o site bloqueia downloads, ou o arquivo é grande demais ou está quebrado.</li>
+            <li><b>Parou no meio do Aplicar:</b> veja o erro no registro, clique em Exportar e depois em Ver mudanças. Só o que faltou aparece. Atenção: itens NOVOS que já foram criados teriam de ser removidos do JSON, senão são criados de novo (a extensão avisa quando o nome já existe).</li>
+            <li><b>Aviso de loja errada:</b> a aba do editor carregou por último uma loja diferente da sua exportação. Exporte de novo da loja certa.</li>
+          </ul>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">Menu JSON Tool · versão <span id="footerVersion">?</span></div>
+  <div id="toast" class="toast"></div>
+  <!-- The order matters: the helpers first, app.js last. -->
+  <script src="imagebank.js"></script>
+  <script src="menu-helpers.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
